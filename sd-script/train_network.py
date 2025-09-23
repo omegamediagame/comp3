@@ -1775,7 +1775,14 @@ class NetworkTrainer:
             # 指定エポックごとにモデルを保存
             optimizer_eval_fn()
             if args.save_every_n_epochs is not None:
-                saving = (epoch + 1) % args.save_every_n_epochs == 0 and (epoch + 1) < num_train_epochs
+                save_epoch = 1
+                len_loss = len(loss_recorder.loss_list)
+                if len_loss < 50:
+                    save_epoch = 50
+                else:
+                    save_epoch = args.save_every_n_epochs
+                    
+                saving = (epoch + 1) % save_epoch == 0 and (epoch + 1) < num_train_epochs
                 if is_main_process and saving:
                     # ckpt_name = train_util.get_epoch_ckpt_name(args, "." + args.save_model_as, epoch + 1)
                     # save_model(ckpt_name, accelerator.unwrap_model(network), global_step, epoch + 1)
